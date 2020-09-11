@@ -31,9 +31,15 @@ def get_special_paths(dirname):
 
 
 def copy_to(path_list, dest_dir):
-    '''Given the --todir arg, a target dir and a destination dir,
-    copy the files in the destination dir to the target dir'''
+    '''Given the --todir arg, a path list and a destination dir,
+    copy the files in the path list to the destination dir'''
     # your code here
+    print('Path List: ', path_list)
+    print('Dest Dir: ', dest_dir)
+    if os.path.exists(dest_dir) is False:
+        os.makedirs(dest_dir)
+    for path in path_list:
+        shutil.copy(path, dest_dir)
     return
 
 
@@ -54,10 +60,6 @@ def main(args):
     parser.add_argument('from_dir', help='target directory')
     ns = parser.parse_args(args)
 
-    if ns.from_dir:
-        special_files = get_special_paths(ns.from_dir)
-        for special_file in special_files:
-            print(special_file, end='\n')
     # TODO: you must write your own code to get the command line args.
     # Read the docs and examples for the argparse module about how to do this.
 
@@ -67,6 +69,10 @@ def main(args):
     # exit(1).
 
     # Your code here: Invoke (call) your functions
+    if ns.from_dir:
+        special_files = get_special_paths(ns.from_dir)
+        for special_file in special_files:
+            print(special_file, end='\n')
 
 
 if __name__ == "__main__":

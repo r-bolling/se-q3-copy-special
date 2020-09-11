@@ -39,13 +39,14 @@ def copy_to(path_list, dest_dir):
     if os.path.exists(dest_dir) is False:
         os.makedirs(dest_dir)
     for path in path_list:
-        shutil.copy(path, dest_dir)
+        if os.path.exists(path):
+            shutil.copy(path, dest_dir)
     return
 
 
 def zip_to(path_list, dest_zip):
-    '''Given the --tozip arg, a target dir and a destination zip,
-    zip the files in the target dir to the destination zip'''
+    '''Given the --tozip arg, a path list and a destination zip,
+    zip the files in the path list to the destination zip'''
     # your code here
     return
 
@@ -69,10 +70,15 @@ def main(args):
     # exit(1).
 
     # Your code here: Invoke (call) your functions
-    if ns.from_dir:
+    if ns.todir and ns.from_dir:
+        copy_to(os.listdir(ns.from_dir), ns.todir)
+    elif ns.from_dir:
         special_files = get_special_paths(ns.from_dir)
         for special_file in special_files:
             print(special_file, end='\n')
+    else:
+        parser.print_usage()
+        sys.exit(1)
 
 
 if __name__ == "__main__":

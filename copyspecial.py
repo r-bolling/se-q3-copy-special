@@ -7,7 +7,14 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 
 # give credits
-__author__ = "r-bolling with help from Kenzie Academy"
+__author__ = '''
+r-bolling with help from:
+Kenzie Academy Lessons
+This cleared up a misconception I had with os.path.abspath
+https://stackoverflow.com/questions/24705679/misunderstanding-of-python-os-path-abspath
+This helped me out with error handling when using subprocess
+https://stackoverflow.com/questions/24849998/how-to-catch-exception-output-from-python-subprocess-check-output
+'''
 
 import re
 import os
@@ -19,19 +26,17 @@ import argparse
 
 def get_special_paths(dirname):
     """Given a dirname, returns a list of all its special files."""
-    # your code here
     special_files = []
     dir_list = os.listdir(dirname)
     special_file_pattern = re.compile(r'.*__\w+__.*')
     for directory in dir_list:
         special_files.extend(special_file_pattern.findall(directory))
-    return [os.path.abspath(x) for x in special_files]
+    return [os.path.abspath(os.path.join(dirname, x)) for x in special_files]
 
 
 def copy_to(path_list, dest_dir):
     '''Given the --todir arg, a path list and a destination dir,
     copy the files in the path list to the destination dir'''
-    # your code here
     print('Path List: ', path_list)
     print('Dest Dir: ', dest_dir)
     if os.path.exists(dest_dir) is False:
@@ -45,7 +50,6 @@ def copy_to(path_list, dest_dir):
 def zip_to(path_list, dest_zip):
     '''Given the --tozip arg, a path list and a destination zip,
     zip the files in the path list to the destination zip'''
-    # your code here
     print('Command I\'m going to do:', '\n', 'zip -j ', dest_zip)
     print(*path_list, sep='\n')
     for path in path_list:
@@ -73,20 +77,22 @@ def main(args):
     # This is input data validation. If something is wrong (or missing) with
     # any required args, the general rule is to print a usage message and
     # exit(1).
+    if not ns:
+        parser.print_usage()
+        sys.exit(1)
 
     # Your code here: Invoke (call) your functions
     if ns.todir and ns.from_dir:
         copy_to(os.listdir(ns.from_dir), ns.todir)
     elif ns.tozip and ns.from_dir:
-        data = zip_to(os.listdir(ns.from_dir), ns.tozip)
-        print(data)
+        valid_files = [
+            os.path.abspath(os.path.join(ns.from_dir, x)) for x in
+            (os.listdir(ns.from_dir))]
+        zip_to(valid_files, ns.tozip)
     elif ns.from_dir and not ns.tozip and not ns.todir:
         special_files = get_special_paths(ns.from_dir)
         for special_file in special_files:
             print(special_file, end='\n')
-    else:
-        parser.print_usage()
-        sys.exit(1)
 
 
 if __name__ == "__main__":
